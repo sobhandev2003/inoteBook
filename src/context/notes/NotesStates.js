@@ -1,76 +1,81 @@
 import { useState } from "react";
 import NotesContext from "./notesContext";
+import { body } from "express-validator";
 const NotesStates=(props)=>{
-    const initialNotes = [
-        {
-          "_id": "64ea06b5024def1f892eef7a",
-          "user": "64e79bf8d5a23eb47445d83f",
-          "titale": "frontend fremwork1",
-          "description": "react js,angular js,vew js ,etc",
-          "tag": "jsFremwork",
-          "date": "2023-08-26T14:05:41.665Z",
-          "__v": 0
-        },
-        {
-          "_id": "64ea06db024def1f892eef7e",
-          "user": "64e79bf8d5a23eb47445d83f",
-          "titale": "frontend fremwork2",
-          "description": "react js,angular js,vew js ,etc",
-          "tag": "jsFremwork",
-          "date": "2023-08-26T14:06:19.333Z",
-          "__v": 0
-        },
-        {
-          "_id": "64ea06db024def1f892eef7e",
-          "user": "64e79bf8d5a23eb47445d83f",
-          "titale": "frontend fremwork2",
-          "description": "react js,angular js,vew js ,etc",
-          "tag": "jsFremwork",
-          "date": "2023-08-26T14:06:19.333Z",
-          "__v": 0
-        },
-        {
-          "_id": "64ea06db024def1f892eef7e",
-          "user": "64e79bf8d5a23eb47445d83f",
-          "titale": "frontend fremwork2",
-          "description": "react js,angular js,vew js ,etc",
-          "tag": "jsFremwork",
-          "date": "2023-08-26T14:06:19.333Z",
-          "__v": 0
-        },
-        {
-          "_id": "64ea06db024def1f892eef7e",
-          "user": "64e79bf8d5a23eb47445d83f",
-          "titale": "frontend fremwork2",
-          "description": "react js,angular js,vew js ,etc",
-          "tag": "jsFremwork",
-          "date": "2023-08-26T14:06:19.333Z",
-          "__v": 0
-        },
-        {
-          "_id": "64ea06db024def1f892eef7e",
-          "user": "64e79bf8d5a23eb47445d83f",
-          "titale": "frontend fremwork2",
-          "description": "react js,angular js,vew js ,etc",
-          "tag": "jsFremwork",
-          "date": "2023-08-26T14:06:19.333Z",
-          "__v": 0
-        },
-        {
-          "_id": "64ea0f92cb78f381c20203bb",
-          "user": "64e79bf8d5a23eb47445d83f",
-          "titale": "frontend fremwork3",
-          "description": "react js,angular js,vew js ,etc",
-          "tag": "jsFremwork",
-          "date": "2023-08-26T14:43:30.875Z",
-          "__v": 0
-        }
-      ]
-     
+    const initialNotes = []
+     const host="http://localhost:5000/api";
      const [notes,setnotes]=useState(initialNotes);
+     //Get  all notes from database
+     const getnotes=async()=>{
+      //API calls
+      const response = await fetch(`${host}/notes/getallnotes`,{
+        method: 'GET',
+        headers:{
+          'Content-Type': 'application/json',
+          'Auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRlYTEzY2MzNjA2MDJhMGU5MzViYjhhIn0sImlhdCI6MTY5MzcxODgwNH0.5_8k6yOfPGWqNMdCpdOEboKXbPQkLkxWjekiGc-rk2w"
+        }
+        
+      })
+      const jason=await response.json();
+     setnotes(jason);
+
+     };
+     //Add note
+    const addNotes =async (titale,description,tag="defult")=>{
+      const response = await fetch(`${host}/notes/addnote`,{
+        method: 'POST',
+        body:JSON.stringify({
+          "titale":titale,
+          "description":description,
+          "tag":tag
+                }),
+        headers:{
+          'Content-Type': 'application/json',
+          'Auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRlYTEzY2MzNjA2MDJhMGU5MzViYjhhIn0sImlhdCI6MTY5MzcxODgwNH0.5_8k6yOfPGWqNMdCpdOEboKXbPQkLkxWjekiGc-rk2w"
+        }
+        
+      })
+      const jason=await response.json();
     
+  
+    
+      setnotes(notes.concat(jason));
+
+    }
+    //Delet note
+    const deletNote=async(id)=>{
+        //API calls
+        console.log(id);
+        const response = await fetch(`${host}/notes/deletnotes/${id}`,{
+          method: 'DELETE',
+          headers:{
+            'Content-Type': 'application/json',
+            'Auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRlYTEzY2MzNjA2MDJhMGU5MzViYjhhIn0sImlhdCI6MTY5MzcxODgwNH0.5_8k6yOfPGWqNMdCpdOEboKXbPQkLkxWjekiGc-rk2w"
+          }
+          
+        })
+        const jason=await response.json();
+        // console.log(jason);
+    const newnote=notes.filter((note)=>{return note._id!==id});
+    setnotes(newnote);
+      
+
+    }
+    //Edit note
+    const editNote=(id,titale,description,tag)=>{
+for (let index = 0; index < notes.length; index++) {
+  const element = notes[index];
+  if (element._id===id){
+    element.titale=titale;
+    element.description=description;
+    element.tag=tag;
+    
+  }
+  
+}
+    }
     return(
-        <NotesContext.Provider value={{notes,setnotes}}>
+        <NotesContext.Provider value={{notes,getnotes,addNotes,editNote,deletNote}}>
             {props.children}
         </NotesContext.Provider>
     )

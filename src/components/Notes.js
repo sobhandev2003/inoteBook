@@ -1,20 +1,26 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import NotesContext from '../context/notes/notesContext'
 import Noteiteam from "./Noteiteam"
+import Addnote from './Addnote';
 
 function Notes() {
     const context=useContext(NotesContext);
-    const {notes,setnotes}=context;
+   
+    const {notes,getnotes}=context;
+    useEffect(()=>{getnotes()},[])
   return (
+    <>
+      <Addnote/>
     <div className='row'>
 
-        <h1>ssddffgghj</h1>
+<h1>Your notes</h1>
      { notes.map((note)=>{
         // return note.titale;
-       return <Noteiteam note={note}/>;
+       return <Noteiteam key={note._id} note={note}/>;
     //    return {note};
       })}
     </div>
+    </>
   )
 }
 
