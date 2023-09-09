@@ -9,7 +9,7 @@ function Alert() {
     <div >
   
    {alert!==null?
-      <div className="alert alert-success" role="alert"> 
+      <div className={`alert alert-${alert.type}`} role="alert"> 
             
     {alert.masge}
 </div> :""} 

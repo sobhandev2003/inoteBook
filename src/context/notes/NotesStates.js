@@ -1,7 +1,9 @@
 import { useState } from "react";
 import NotesContext from "./notesContext";
-import { body } from "express-validator";
+// import { body } from "express-validator";
+
 const NotesStates=(props)=>{
+  // const authToken=localStorage.getItem('token');
     const initialNotes = []
      const host="http://localhost:5000/api";
      const [notes,setnotes]=useState(initialNotes);
@@ -18,7 +20,7 @@ const NotesStates=(props)=>{
       })
       const jason=await response.json();
      setnotes(jason);
-
+          // console.log(authToken);
      };
      //Add note
     const addNotes =async (titale,description,tag="defult")=>{
@@ -45,6 +47,9 @@ const NotesStates=(props)=>{
     //Delet note
     const deletNote=async(id)=>{
         //API calls
+        try{
+
+        
         console.log(id);
         const response = await fetch(`${host}/notes/deletnotes/${id}`,{
           method: 'DELETE',
@@ -54,26 +59,69 @@ const NotesStates=(props)=>{
           }
           
         })
+        // eslint-disable-next-line
         const jason=await response.json();
         // console.log(jason);
     const newnote=notes.filter((note)=>{return note._id!==id});
     setnotes(newnote);
       
-
+      }
+      catch(err) {
+        console.log(err);
+      }
     }
     //Edit note
-    const editNote=(id,titale,description,tag)=>{
-for (let index = 0; index < notes.length; index++) {
-  const element = notes[index];
+    const editNote=async(id,titale,description,tag)=>{
+      // API 
+          //API calls
+          // console.log(id);
+          try{
+
+          
+          const response = await fetch(`${host}/notes/updetnotes/${id}`,{
+            method: 'PUT',
+            body:JSON.stringify({
+              "titale":titale,
+              "description":description,
+              "tag":tag
+                    }),
+            headers:{
+              'Content-Type': 'application/json',
+              'Auth-token':"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRlYTEzY2MzNjA2MDJhMGU5MzViYjhhIn0sImlhdCI6MTY5MzcxODgwNH0.5_8k6yOfPGWqNMdCpdOEboKXbPQkLkxWjekiGc-rk2w"
+            }
+            
+          })
+          // eslint-disable-next-line
+          const jason=await response.json();
+          console.log(jason.titale);
+          console.log(titale);
+          if(jason.titale!==titale||jason.description!==description){
+            return false;
+          }
+         
+      //-------------
+      const newnote=JSON.parse(JSON.stringify(notes));
+for (let index = 0; index < newnote.length; index++) {
+  const element = newnote[index];
   if (element._id===id){
-    element.titale=titale;
-    element.description=description;
-    element.tag=tag;
+  
+    newnote[index].titale=titale;
+    newnote[index].description=description;
+    newnote[index].tag=tag;
+    break;
     
   }
   
 }
+setnotes(newnote);
+return true;
+}
+catch{
+  return false;
+}
+// getnotes();
     }
+
     return(
         <NotesContext.Provider value={{notes,getnotes,addNotes,editNote,deletNote}}>
             {props.children}

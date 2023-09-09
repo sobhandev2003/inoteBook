@@ -9,21 +9,23 @@ const router=express.Router();
 const { body, validationResult } = require('express-validator');
 // const { Route } = require('react-router-dom/cjs/react-router-dom.min');
 // Creat a new user 
+
 router.post('/creatUser',[
   body('name',"Enter the name atlest 4 character").isLength({min:4}),
   body('mail',"Enter a valid mail").isEmail(),
   body('pasword',"password atlest 5 character long").isLength({min:5})
 ],async(req, res) => {
+  let suces=false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({"suces":suces, errors: errors.array() });
   }
 
 try{
   
 let user=await User.findOne({mail:req.body.mail});
 if (user) {
-  return res.status(404).json({errors: "this email allready exists."});
+  return res.status(404).json({"suces":suces, errors: "this email allready exists."});
 }
 const salt =await bcrypt.genSaltSync(10);
   const sec_password = await bcrypt.hash(req.body.pasword,salt);
@@ -39,13 +41,14 @@ const salt =await bcrypt.genSaltSync(10);
     }
   }
   const authentoken= jwt.sign(data,JWT_SECRET_KEY);
-  res.json({authentoken});
+  suces=true;
+  res.json({"suces":suces,authentoken});
   // res.json({"message":"successfully created your acount."});
 }
 catch(err)
 { 
   console.log(err);
-  res.status(500).send({"message":"some error acour"});
+  res.status(500).send({"suces":suces,"message":"some error acour"});
 }
   
 });
@@ -55,6 +58,7 @@ router.post('/login',[
   body('mail',"Enter a valid mail").isEmail(),
   body('pasword',"pasword can't blank").exists()
 ],async(req, res) => {
+  let suces=false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -64,7 +68,7 @@ router.post('/login',[
   const user=await User.findOne({mail:mail});
   // console.log(user);
   if(!user){
-    return res.status(404).sen("This mail not exist");
+    return res.status(404).sen({"suces":suces,"message":"This mail not exist"});
   }
   const password_compaier=await bcrypt.compare(pasword,user.pasword);
   // console.log(password_compaier);
@@ -77,24 +81,26 @@ router.post('/login',[
     }
   }
   const authentoken= jwt.sign(data,JWT_SECRET_KEY);
-  res.json({authentoken});
+  suces=true;
+  res.json({"suces":suces,authentoken});
 
 }
 catch(err){
   console.log(err);
-  res.status(500).send({"message":"some error acour"});
+  res.status(500).send({ "suces":suces, "message":"some error acour"});
 }
 });
 //Get user
 router.post('/getuser',fetchuser,async(req, res)=>{
+  let suces=false;
   try{
 const userId=req.user.id;
 const userDetails=await User.findById(userId).select("-pasword");
-res.send(userDetails);
+res.send({"suces":suces,"userDetails":userDetails});
   }
   catch(err){
     console.log(err);
-    res.status(500).send({"message":"some error acour"});
+    res.status(500).send({"suces":suces,"message":"some error acour"});
   }
 })
 

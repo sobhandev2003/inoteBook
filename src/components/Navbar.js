@@ -8,7 +8,7 @@ function Navbar() {
   let location=useLocation();
  
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+    <nav className="navbar navbar-expand-lg bg-body-tertiary d-flex">
   <div className="container-fluid">
     <Link className="navbar-brand" to="/">Navbar</Link>
     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,6 +26,10 @@ function Navbar() {
        
       </ul>
     </div>
+      <form className="d-flex float-end" role="search">
+      <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
+      <Link className="btn btn-primary mx-1" to="/signup" role="button">Sign Up</Link>
+      </form>
   </div>
 </nav>
   )
