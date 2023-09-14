@@ -3,16 +3,26 @@ import NotesContext from '../context/notes/notesContext'
 import Noteiteam from "./Noteiteam"
 import Addnote from './Addnote';
 import AlertContext from '../context/alert/alertContext';
+import { useNavigate } from 'react-router-dom';
 // import Updetnote from './Updetnote';
 
 
 function Notes(props) {
+  const navigate=useNavigate();
   const alertcontext=useContext(AlertContext);
   const{showAleart}=alertcontext;
     const context=useContext(NotesContext);
    
     const {notes,getnotes,editNote}=context;
-    useEffect(()=>{getnotes()}
+    useEffect(()=>{
+      if(localStorage.getItem('token')){
+
+        getnotes();
+      }
+    else{
+      navigate('/login');
+    }
+    }
     // eslint-disable-next-line
     ,[]);
     const ref=useRef(null);
